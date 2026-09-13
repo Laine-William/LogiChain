@@ -1,0 +1,73 @@
+- name: Installer Node.js et les dépendances système (curl, git, rsync)
+  apt:
+    name:
+      - curl
+      - git
+      - rsync
+      - build-essential
+    state: present
+    update_cache: yes
+
+- name: Ajouter le dépôt Node.js officiel (Node.js 18.x ou 20.x)
+  shell: curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+  args:
+    creates: /usr/bin/node
+
+- name: Installer Node.js
+  apt:
+    name: nodejs
+    state: present
+
+- name: Créer le répertoire de l'application LogiChain
+  file:
+    path: /opt/logichain
+    state: directory
+    owner: laine_william01
+    group: laine_william01
+    mode: '0755'
+
+- name: Synchroniser le projet LogiChain complet sur la VM
+  synchronize:
+    src: "../../logichain/"
+    dest: "/opt/logichain"
+    rsync_opts:
+      - "--exclude=.git"
+      - "--exclude=node_modules"
+      - "--exclude=front-end"
+      - "--exclude=android"
+      - "--exclude=ios"
+      - "--exclude=.idea"
+      - "--exclude=.vscode"
+      - "--exclude=ansible"
+
+- name: Installer les dépendances Node.js à la racine
+  npm:
+    path: /opt/logichain
+    state: present
+    production: yes
+  become_user: laine_william01
+
+- name: Installer les dépendances Node.js du back-end
+  npm:
+    path: /opt/logichain/back-end
+    state: present
+    production: yes
+  become_user: laine_william01
+
+- name: Installer PM2 globalement
+  npm:
+    name: pm2
+    global: yes
+  become: yes
+
+- name: Démarrer ou redémarrer l'application avec PM2
+  shell: pm2 restart logichain-back || pm2 start server.js --name "logichain-back"
+  args:
+    chdir: /opt/logichain/back-end
+  become_user: laine_william01
+  register: pm2_start
+  changed_when: "'[PM2]' in pm2_start.stdout"
+
+- name: Sauvegarder la configuration PM2 et configurer le démarrage automatique
+  shell: pm2 startup systemd -u laine_william01 --hp /home/laine_william01 && pm2 save
+  become: yes

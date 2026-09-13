@@ -1,0 +1,157 @@
+paths:
+  /api/events/stats:
+    get:
+      summary: Récupère les statistiques du tableau de bord
+      tags: [Events]
+      responses:
+        200:
+          description: Statistiques récupérées avec succès
+        500:
+          description: Erreur interne du serveur
+
+  /api/events/stats/users/{userId}:
+    get:
+      summary: Récupère les statistiques pour un utilisateur spécifique
+      tags: [Events]
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Statistiques de l'utilisateur récupérées avec succès
+        403:
+          description: Accès non autorisé
+        500:
+          description: Erreur interne du serveur
+
+  /api/events:
+    get:
+      summary: Liste tous les événements
+      tags: [Events]
+      responses:
+        200:
+          description: Liste des événements récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+    post:
+      summary: Crée un nouvel événement
+      tags: [Events]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventCreate'
+      responses:
+        201:
+          description: Événement créé avec succès
+
+  /api/events/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Récupère un événement par son ID
+      tags: [Events]
+      responses:
+        200:
+          description: Détails de l'événement
+    put:
+      summary: Met à jour complètement un événement
+      tags: [Events]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdate'
+      responses:
+        200:
+          description: Événement mis à jour
+    patch:
+      summary: Modifie partiellement un événement
+      tags: [Events]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdate'
+      responses:
+        200:
+          description: Événement modifié
+    delete:
+      summary: Supprime un événement
+      tags: [Events]
+      responses:
+        200:
+          description: Événement supprimé
+
+  /api/events/users/{userId}:
+    get:
+      summary: Liste les événements d'un utilisateur spécifique
+      tags: [Events]
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Liste des événements de l'utilisateur récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+        404:
+          description: Aucun événement trouvé pour cet utilisateur
+
+  /api/events/status/{status}:
+    get:
+      summary: Récupère les événements par statut
+      tags: [Events]
+      parameters:
+        - in: path
+          name: status
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Liste des événements filtrée par statut
+
+  /api/events/{id}/status:
+    patch:
+      summary: Met à jour le statut d'un événement
+      tags: [Events]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+      responses:
+        200:
+          description: Statut de l'événement mis à jour

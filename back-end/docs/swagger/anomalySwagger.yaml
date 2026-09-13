@@ -1,0 +1,132 @@
+paths:
+  /api/anomalies:
+    get:
+      summary: Liste toutes les anomalies
+      tags: [Anomalies]
+      responses:
+        200:
+          description: Liste des anomalies récupérée
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Anomaly'
+    post:
+      summary: Crée une nouvelle anomalie
+      tags: [Anomalies]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnomalyCreate'
+      responses:
+        201:
+          description: Anomalie créée
+        400:
+          description: Données invalides
+        409:
+          description: Anomalie déjà existante
+
+  /api/anomalies/nearby:
+    get:
+      summary: Liste les anomalies proches
+      tags: [Anomalies]
+      parameters:
+        - in: query
+          name: latitude
+          required: true
+          schema:
+            type: number
+          description: Latitude du point de recherche
+        - in: query
+          name: longitude
+          required: true
+          schema:
+            type: number
+          description: Longitude du point de recherche
+        - in: query
+          name: radius
+          required: true
+          schema:
+            type: number
+          description: Rayon de recherche en mètres
+      responses:
+        200:
+          description: Succès, retourne la liste des anomalies proches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Anomaly'
+        400:
+          description: Coordonnées manquantes ou rayon invalide
+
+  /api/anomalies/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: ID de l'anomalie
+    get:
+      summary: Récupère une anomalie par son ID
+      tags: [Anomalies]
+      responses:
+        200:
+          description: Détails de l'anomalie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Anomaly'
+        404:
+          description: Anomalie introuvable
+    put:
+      summary: Met à jour une anomalie
+      tags: [Anomalies]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnomalyUpdate'
+      responses:
+        200:
+          description: Anomalie mise à jour
+        400:
+          description: Données invalides
+        404:
+          description: Anomalie introuvable
+        409:
+          description: Anomalie déjà existante
+    patch:
+      summary: Modifie partiellement une anomalie
+      tags: [Anomalies]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnomalyUpdate'
+      responses:
+        200:
+          description: Anomalie modifiée
+        400:
+          description: Données invalides
+        404:
+          description: Anomalie introuvable
+        409:
+          description: Anomalie déjà existante
+    delete:
+      summary: Supprime une anomalie
+      tags: [Anomalies]
+      responses:
+        200:
+          description: Anomalie supprimée
+        404:
+          description: Anomalie introuvable
+        409:
+          description: Anomalie déjà traitée

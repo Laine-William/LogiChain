@@ -1,0 +1,121 @@
+paths:
+  /api/logistics/{id}/steps:
+    get:
+      summary: Liste toutes les étapes d'une route logistique
+      tags: [LogisticSteps]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: Liste des étapes récupérée
+    post:
+      summary: Ajoute une étape à une route logistique
+      tags: [LogisticSteps]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StepLogisticCreate'
+      responses:
+        200:
+          description: Étape ajoutée
+
+  /api/logistics/{id}/steps/{stepId}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: string }
+      - in: path
+        name: stepId
+        required: true
+        schema: { type: string }
+    get:
+      summary: Récupère une étape par son ID
+      tags: [LogisticSteps]
+      responses:
+        200:
+          description: Détails de l'étape
+    put:
+      summary: Met à jour complète d'une étape
+      tags: [LogisticSteps]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StepLogisticUpdate'
+      responses:
+        200:
+          description: Étape mise à jour
+    patch:
+      summary: Modifie partiellement une étape
+      tags: [LogisticSteps]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StepLogisticUpdate'
+      responses:
+        200:
+          description: Étape modifiée partiellement
+    delete:
+      summary: Supprime une étape
+      tags: [LogisticSteps]
+      responses:
+        200:
+          description: Étape supprimée
+
+  /api/logistics/{id}/steps/status/{status}:
+    get:
+      summary: Récupère les étapes selon le statut
+      tags: [LogisticSteps]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: path
+          name: status
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: Liste des étapes filtrée par statut
+
+  /api/logistics/{id}/steps/{stepId}/status:
+    patch:
+      summary: Met à jour le statut d'une étape
+      tags: [LogisticSteps]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: path
+          name: stepId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: 
+                  type: string
+                  enum: ['to_do', 'in_progress', 'completed', 'blocked', 'delayed', 'cancelled']
+      responses:
+        200:
+          description: Statut de l'étape mise à jour

@@ -1,0 +1,9 @@
+---
+- name: Provisionnement initial LogiChain
+  hosts: all
+  become: yes
+  roles:
+    - system_security
+    - database
+    - app
+    - nginx

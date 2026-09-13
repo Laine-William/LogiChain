@@ -1,0 +1,28 @@
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+
+- name: Configure Nginx reverse proxy for Node.js API
+  copy:
+    dest: "/etc/nginx/sites-available/logichain"
+    content: |
+      server {
+          listen 80;
+          server_name _;
+          location / {
+              proxy_pass http://127.0.0.1:5000;
+              proxy_http_version 1.1;
+              proxy_set_header Upgrade $http_upgrade;
+              proxy_set_header Connection 'upgrade';
+              proxy_set_header Host $host;
+              proxy_cache_bypass $http_upgrade;
+          }
+      }
+
+- name: Enable Nginx site configuration
+  file:
+    src: /etc/nginx/sites-available/logichain
+    dest: /etc/nginx/sites-enabled/logichain
+    state: link
+  notify: reload nginx

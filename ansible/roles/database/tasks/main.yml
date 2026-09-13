@@ -1,0 +1,36 @@
+- name: Ensure keyrings directory exists
+  file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Install dependencies (curl, gnupg)
+  apt:
+    name:
+      - curl
+      - gnupg
+    state: present
+    update_cache: no
+
+- name: Download and dearmor MongoDB GPG key
+  shell: |
+    curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | gpg --dearmor --yes -o /usr/share/keyrings/mongodb-server-7.0.gpg
+
+- name: Add MongoDB repository for Debian with insecure flag for Trixie
+  copy:
+    content: "deb [ arch=amd64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg allow-insecure=yes ] https://repo.mongodb.org/apt/debian bookworm/mongodb-org/7.0 main\n"
+    dest: /etc/apt/sources.list.d/mongodb-org-7.0.list
+    mode: '0644'
+
+- name: Install MongoDB and update cache safely
+  apt:
+    name: mongodb-org
+    state: present
+    update_cache: yes
+    allow_unauthenticated: yes
+
+- name: Start and enable MongoDB
+  systemd:
+    name: mongod
+    state: started
+    enabled: yes

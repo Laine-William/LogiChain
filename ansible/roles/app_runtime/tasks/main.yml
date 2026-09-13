@@ -1,0 +1,12 @@
+- name: Download Node.js setup script
+  shell: curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+
+- name: Install Node.js
+  apt:
+    name: nodejs
+    state: present
+
+- name: Install PM2 globally
+  npm:
+    name: pm2
+    global: yes

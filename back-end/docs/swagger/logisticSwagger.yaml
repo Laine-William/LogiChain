@@ -1,0 +1,125 @@
+paths:
+  /api/logistics:
+    get:
+      summary: Liste toutes les routes logistiques
+      tags: [Logistics]
+      responses:
+        200:
+          description: Liste des routes logistiques récupérées
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Logistic'
+    post:
+      summary: Crée une nouvelle route logistique
+      tags: [Logistics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogisticCreate'
+      responses:
+        201:
+          description: Route logistique créée avec succès
+        400:
+          description: Données invalides
+
+  /api/logistics/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Récupère une route logistique par son ID
+      tags: [Logistics]
+      responses:
+        200:
+          description: Détails d'une route logistique récupéré par son ID
+        404:
+          description: Route logistique non trouvée
+    put:
+      summary: Met à jour complètement une route logistique
+      tags: [Logistics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogisticUpdate'
+      responses:
+        200:
+          description: Route logistique mise à jour
+    patch:
+      summary: Modifie partiellement une route logistique
+      tags: [Logistics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogisticUpdate'
+      responses:
+        200:
+          description: Route logistique modifiée partiellement
+    delete:
+      summary: Supprime une route logistique
+      tags: [Logistics]
+      responses:
+        200:
+          description: Route logistique supprimée
+
+  /api/logistics/status/{status}:
+    get:
+      summary: Récupère les routes logistiques par statut
+      tags: [Logistics]
+      parameters:
+        - in: path
+          name: status
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Liste des routes logistiques filtrées par statut
+
+  /api/logistics/{id}/status:
+    patch:
+      summary: Met à jour le statut d'une route logistique
+      tags: [Logistics]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+      responses:
+        200:
+          description: Statut logistique mis à jour
+
+  /api/logistics/{id}/carbon-impact:
+    get:
+      summary: Récupère l'impact carbone d'une route logistique
+      tags: [Logistics]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Calcul de l'impact carbone pour une route logistique

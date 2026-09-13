@@ -1,0 +1,28 @@
+- name: Installer Nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Déployer la configuration Nginx pour LogiChain
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/logichain
+  become: yes
+  notify: Redémarrer Nginx
+
+- name: Activer le site LogiChain dans Nginx
+  file:
+    src: /etc/nginx/sites-available/logichain
+    dest: /etc/nginx/sites-enabled/logichain
+    state: link
+  become: yes
+  notify: Redémarrer Nginx
+
+- name: Supprimer la configuration par défaut Nginx
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  become: yes
+  notify: Redémarrer Nginx

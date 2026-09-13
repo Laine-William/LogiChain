@@ -1,0 +1,183 @@
+paths:
+  /api/users:
+    get:
+      summary: Liste tous les utilisateurs
+      tags: [Users]
+      responses:
+        200:
+          description: Liste des utilisateurs récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /api/users/role/{role}:
+    get:
+      summary: Liste les utilisateurs par rôle
+      tags: [Users]
+      parameters:
+        - in: path
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: [superadmin, admin, operator, viewer, user]
+      responses:
+        200:
+          description: Liste des utilisateurs récupérée avec succès
+        404:
+          description: Aucun utilisateur trouvé avec ce rôle
+
+  /api/users/account/{status}:
+    get:
+      summary: Liste les utilisateurs par statut de compte
+      tags: [Users]
+      parameters:
+        - in: path
+          name: status
+          required: true
+          schema:
+            type: string
+            enum: ['active', 'suspended', 'pending']
+      responses:
+        200:
+          description: Liste des utilisateurs récupérée
+
+  /api/users/availability/{status}:
+    get:
+      summary: Liste les utilisateurs par statut de disponibilité
+      tags: [Users]
+      parameters:
+        - in: path
+          name: status
+          required: true
+          schema:
+            type: string
+            enum: ['online', 'busy', 'offline', 'out of office', 'absent']
+      responses:
+        200:
+          description: Liste des utilisateurs récupérée
+
+  /api/users/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Récupère un utilisateur par son ID
+      tags: [Users]
+      responses:
+        200:
+          description: Détails de l'utilisateur
+        404:
+          description: Utilisateur non trouvé
+    put:
+      summary: Met à jour complètement un utilisateur
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        200:
+          description: Utilisateur mis à jour avec succès
+    patch:
+      summary: Modifie partiellement un utilisateur
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        200:
+          description: Utilisateur modifié partiellement avec succès
+    delete:
+      summary: Supprime un utilisateur
+      tags: [Users]
+      responses:
+        200:
+          description: Utilisateur supprimé avec succès
+
+  /api/users/register:
+    post:
+      summary: Enregistre un nouvel utilisateur
+      tags: [UserRegister]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+      responses:
+        201:
+          description: Utilisateur créé avec succès
+        400:
+          description: Données invalides
+
+  /api/users/login:
+    post:
+      summary: Connecte un utilisateur et retourne un jeton JWT
+      tags: [UserLogin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        200:
+          description: Connexion réussie, jeton retourné
+        401:
+          description: Identifiants invalides
+
+  /api/users/{id}/account:
+    patch:
+      summary: Met à jour le statut du compte
+      tags: [Users]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountStatus: { type: string }
+      responses:
+        200:
+          description: Statut du compte mis à jour
+
+  /api/users/{id}/availability:
+    patch:
+      summary: Met à jour le status pour la disponibilité
+      tags: [Users]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                availability: { type: string }
+      responses:
+        200:
+          description: Status de la disponibilité mise à jour

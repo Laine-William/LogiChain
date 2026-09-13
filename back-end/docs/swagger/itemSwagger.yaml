@@ -1,0 +1,113 @@
+paths:
+  /api/items:
+    get:
+      summary: Liste tous les items
+      tags: [Items]
+      responses:
+        200:
+          description: Liste des items récupérée
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+    post:
+      summary: Crée un nouvel item
+      tags: [Items]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemCreate'
+      responses:
+        201:
+          description: Item créé
+        409:
+          description: Item déjà existant
+
+  /api/items/status/{status}:
+    get:
+      summary: Récupère les items par statut
+      tags: [Items]
+      parameters:
+        - in: path
+          name: status
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Liste des items filtrée par statut
+
+  /api/items/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: ID de l'item
+    get:
+      summary: Récupère un item par son ID
+      tags: [Items]
+      responses:
+        200:
+          description: Détails de l'item
+    put:
+      summary: Met à jour complètement un item
+      tags: [Items]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemUpdate'
+      responses:
+        200:
+          description: Item mis à jour
+    patch:
+      summary: Modifie partiellement un item
+      tags: [Items]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemUpdate'
+      responses:
+        200:
+          description: Item modifié
+    delete:
+      summary: Supprime un item
+      tags: [Items]
+      responses:
+        200:
+          description: Item supprimé
+
+  /api/items/{id}/status:
+    patch:
+      summary: Met à jour le statut d'un item
+      tags: [Items]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: ['available', 'in_use', 'maintenance', 'reserved', 'archived']
+              required:
+                - status
+      responses:
+        200:
+          description: Statut mis à jour
