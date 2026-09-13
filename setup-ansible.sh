@@ -118,7 +118,7 @@ EOF
 # 6. Rôle app_runtime
 cat << 'EOF' > ansible/roles/app_runtime/tasks/main.yml
 - name: Download Node.js setup script
-  shell: curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+  shell: curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 
 - name: Install Node.js
   apt:
