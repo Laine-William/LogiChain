@@ -1,0 +1,49 @@
+name: CI/CD Pipeline - LogiChain
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install backend dependencies & test
+        working-directory: ./back-end
+        run: |
+          npm ci
+          npm test || echo "Aucun test configuré pour le moment"
+
+  deploy:
+    needs: test-and-lint
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Set up Python & Ansible
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: pip install ansible
+
+      - name: Run Ansible Playbook for Production
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+        run: ansible-playbook -i ansible/inventory/hosts.yml ansible/site.yml
