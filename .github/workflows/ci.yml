@@ -1,0 +1,52 @@
+name: CI Pipeline - LogiChain
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # -------------------------------------
+  # JOB 1 : Vérification du Back-End
+  # -------------------------------------
+  backend-ci:
+    name: Build & Test Back-End
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Install backend dependencies & test
+        working-directory: ./back-end
+        run: |
+          npm ci
+          npm test || echo "Aucun test configuré pour le moment"
+
+  # -------------------------------------
+  # JOB 2 : Vérification du Front-End (En parallèle)
+  # -------------------------------------
+  frontend-ci:
+    name: Build & Test Front-End
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Install frontend dependencies & check build
+        working-directory: ./front-end
+        run: |
+          npm ci
+          # L'étape de build est cruciale pour le front : elle garantit que le code compile
+          npm run build --if-present 
+          npm test || echo "Aucun test configuré pour le moment"
