@@ -1,0 +1,35 @@
+name: CD Pipeline - LogiChain
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline - LogiChain"] # Doit correspondre exactement au "name" du fichier ci.yml
+    branches: [main]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # TRÈS IMPORTANT : On vérifie que le CI a réussi avant de déployer
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Set up Python & Ansible
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Run Ansible Playbook for Production
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+        run: ansible-playbook -i ansible/inventory/hosts.yml ansible/site.yml
