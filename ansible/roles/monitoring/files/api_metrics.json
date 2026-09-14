@@ -1,0 +1,61 @@
+{
+  "title": "LogiChain - API Node.js",
+  "tags": ["nodejs", "express", "logichain"],
+  "timezone": "browser",
+  "refresh": "5s",
+  "schemaVersion": 36,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Utilisation Mémoire (Heap)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "nodejs_heap_size_used_bytes{job=\"logichain-backend\"}",
+          "legendFormat": "Heap Utilisé"
+        },
+        {
+          "expr": "nodejs_heap_size_total_bytes{job=\"logichain-backend\"}",
+          "legendFormat": "Heap Total"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Utilisation CPU",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(process_cpu_user_seconds_total{job=\"logichain-backend\"}[1m])",
+          "legendFormat": "CPU (Temps utilisateur)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Latence de l'Event Loop (Surchauffe Node.js)",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "nodejs_eventloop_lag_seconds{job=\"logichain-backend\"}",
+          "legendFormat": "Latence (Lag)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      }
+    }
+  ]
+}
