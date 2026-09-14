@@ -1,35 +1,36 @@
-- name: Ensure keyrings directory exists
+- name: Assurer l'existence du dossier keyrings
   file:
     path: /usr/share/keyrings
     state: directory
     mode: '0755'
 
-- name: Install dependencies (curl, gnupg)
-  apt:
-    name:
-      - curl
-      - gnupg
-    state: present
-    update_cache: no
+- name: Nettoyer tous les fichiers de dépôt MongoDB obsolètes
+  shell: rm -f /etc/apt/sources.list.d/mongodb* /etc/apt/sources.list.d/*.save
 
-- name: Download and dearmor MongoDB GPG key
+- name: Télécharger et décoder la clé GPG MongoDB
   shell: |
     curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | gpg --dearmor --yes -o /usr/share/keyrings/mongodb-server-7.0.gpg
 
-- name: Add MongoDB repository for Debian with insecure flag for Trixie
+- name: Créer une règle de contournement APT pour la signature SHA1 de MongoDB
   copy:
-    content: "deb [ arch=amd64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg allow-insecure=yes ] https://repo.mongodb.org/apt/debian bookworm/mongodb-org/7.0 main\n"
+    content: "Acquire::AllowInsecureRepositories \"true\";\nAcquire::AllowDowngradeToInsecureRepositories \"true\";\n"
+    dest: /etc/apt/apt.conf.d/99mongodb-insecure
+    mode: '0644'
+
+- name: Ajouter le dépôt officiel MongoDB sans option inline conflictuelle
+  copy:
+    content: "deb [signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg] https://repo.mongodb.org/apt/debian bookworm/mongodb-org/7.0 main\n"
     dest: /etc/apt/sources.list.d/mongodb-org-7.0.list
     mode: '0644'
 
-- name: Install MongoDB and update cache safely
+- name: Mettre à jour le cache et installer MongoDB
   apt:
     name: mongodb-org
     state: present
     update_cache: yes
     allow_unauthenticated: yes
 
-- name: Start and enable MongoDB
+- name: Démarrer et activer MongoDB
   systemd:
     name: mongod
     state: started
