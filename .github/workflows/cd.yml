@@ -2,8 +2,8 @@ name: CD Pipeline - LogiChain
 
 on:
   workflow_run:
-    workflows: ["CI Pipeline - LogiChain"] # Doit correspondre exactement au "name" du fichier ci.yml
-    branches: [main]
+    workflows: ["CI Pipeline - LogiChain"]
+    branches: [develop]
     types:
       - completed
 
