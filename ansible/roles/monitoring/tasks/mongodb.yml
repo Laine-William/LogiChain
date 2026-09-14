@@ -1,0 +1,26 @@
+---
+- name: Installer les dépendances pour les dépôts externes
+  apt:
+    name:
+      - gnupg
+      - curl
+    state: present
+    update_cache: yes
+
+- name: Télécharger et ajouter la clé GPG MongoDB
+  get_url:
+    url: https://www.mongodb.org/static/pgp/server-7.0.asc
+    dest: /usr/share/keyrings/mongodb-server-7.0.gpg
+    mode: '0644'
+
+- name: Ajouter le dépôt officiel MongoDB pour Debian
+  apt_repository:
+    repo: "deb [ signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/debian bookworm/mongodb-org/7.0 main"
+    state: present
+    update_cache: yes
+
+- name: Installer et démarrer MongoDB
+  apt:
+    name: mongodb-org
+    state: present
+  notify: restart mongod

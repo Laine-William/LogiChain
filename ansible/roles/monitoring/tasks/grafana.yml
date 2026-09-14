@@ -1,0 +1,60 @@
+---
+- name: Installer le paquet Grafana via DEB
+  apt:
+    deb: "https://dl.grafana.com/oss/release/grafana_10.4.0_amd64.deb"
+    state: present
+
+- name: Configurer le port de Grafana sur 3001 (Évite le conflit Node.js)
+  lineinfile:
+    path: /etc/grafana/grafana.ini
+    regexp: '^;?http_port ='
+    line: 'http_port = 3001'
+  notify: restart grafana-server
+
+- name: Configurer Prometheus comme Data Source par défaut
+  copy:
+    dest: /etc/grafana/provisioning/datasources/prometheus.yml
+    content: |
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://localhost:9090
+          isDefault: true
+    mode: '0644'
+  notify: restart grafana-server
+
+- name: Configurer le provider de Dashboards Grafana
+  copy:
+    dest: /etc/grafana/provisioning/dashboards/default.yml
+    content: |
+      apiVersion: 1
+      providers:
+        - name: 'LogiChain Dashboards'
+          orgId: 1
+          folder: ''
+          type: file
+          disableDeletion: false
+          updateIntervalSeconds: 10
+          options:
+            path: /var/lib/grafana/dashboards
+    mode: '0644'
+  notify: restart grafana-server
+
+- name: Créer le dossier pour stocker les fichiers JSON des dashboards
+  file:
+    path: /var/lib/grafana/dashboards
+    state: directory
+    owner: grafana
+    group: grafana
+    mode: '0755'
+
+- name: Pousser le dashboard JSON de l'API
+  copy:
+    src: api_metrics.json
+    dest: /var/lib/grafana/dashboards/api_metrics.json
+    owner: grafana
+    group: grafana
+    mode: '0644'
+  notify: restart grafana-server
