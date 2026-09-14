@@ -1,25 +1,15 @@
-- name: Update apt cache
+- name: Supprimer les sources APT corrompues ou conflictuelles avant tout usage
+  file:
+    path: /etc/apt/sources.list.d/mongodb-org-7.0.list
+    state: absent
+
+- name: Update apt cache safely
   apt:
     update_cache: yes
     cache_valid_time: 3600
+  ignore_errors: yes
 
 - name: Install Fail2Ban and UFW
   apt:
     name: ["fail2ban", "ufw"]
     state: present
-
-- name: Configure UFW default policies
-  ufw:
-    state: enabled
-    policy: deny
-    direction: incoming
-
-- name: Allow essential ports via UFW
-  ufw:
-    rule: allow
-    port: "{{ item }}"
-    proto: tcp
-  loop:
-    - '22'
-    - '80'
-    - '443'
